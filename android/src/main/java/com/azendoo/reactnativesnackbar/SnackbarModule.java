@@ -2,8 +2,10 @@ package com.azendoo.reactnativesnackbar;
 
 import android.graphics.Color;
 import android.graphics.Typeface;
+
 import com.google.android.material.snackbar.Snackbar;
 
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.util.Log;
 import android.view.View;
@@ -20,6 +22,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import android.content.Context;
+import android.util.DisplayMetrics;
+import android.widget.FrameLayout;
 
 public class SnackbarModule extends ReactContextBaseJavaModule {
 
@@ -126,8 +132,14 @@ public class SnackbarModule extends ReactContextBaseJavaModule {
         }
         View snackbarView = snackbar.getView();
 
-        TextView textView = (TextView) snackbarView.findViewById(android.support.design.R.id.snackbar_text);
-        textView.setMaxLines(numberOfLines);
+        FrameLayout.LayoutParams param = (FrameLayout.LayoutParams) snackbarView.getLayoutParams();
+        param.setMargins(
+                (int) convertDpToPixel(16, snackbarView.getContext()),
+                0,
+                (int) convertDpToPixel(16, snackbarView.getContext()),
+                (int) convertDpToPixel(16 + 58, snackbarView.getContext()));
+
+        snackbarView.setLayoutParams(param);
 
         if (rtl && Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
             snackbarView.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
@@ -136,6 +148,7 @@ public class SnackbarModule extends ReactContextBaseJavaModule {
 
         TextView snackbarText = snackbarView.findViewById(com.google.android.material.R.id.snackbar_text);
         snackbarText.setTextColor(textColor);
+        snackbarText.setMaxLines(numberOfLines);
 
         if (font != null) {
             snackbarText.setTypeface(font);
@@ -206,6 +219,10 @@ public class SnackbarModule extends ReactContextBaseJavaModule {
 
     private boolean getOptionValue(ReadableMap options, String key, boolean fallback) {
         return options.hasKey(key) ? options.getBoolean(key) : fallback;
+    }
+
+    public static float convertDpToPixel(float dp, Context context) {
+        return dp * ((float) context.getResources().getDisplayMetrics().densityDpi / DisplayMetrics.DENSITY_DEFAULT);
     }
 
 }
